@@ -10,8 +10,9 @@ from django.urls import reverse_lazy
 class ShortURLCreateView(LoginRequiredMixin, CreateView):
     model = ShortURL
     form_class = ShortURLForm
-    template_name = "create_short_url.html"
+    template_name = "shortner/create_short_url.html"
     success_url = reverse_lazy("dashboard")
+    
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -20,17 +21,20 @@ class ShortURLCreateView(LoginRequiredMixin, CreateView):
 #list urls
 class ShortURLListView(LoginRequiredMixin, ListView):
     model = ShortURL
-    template_name = "dashboard.html"
+    template_name = "shortner/dashboard.html"
     context_object_name = "urls"
 
-    def get_queryset(self):
-        return ShortURL.objects.filter(user=self.request.user).order_by("-created_at")
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        urls = context["urls"]
+        context["total_clicks"] = sum(url.click_count for url in urls)
+        return context
     
 #edit url
 class ShortURLUpdateView(LoginRequiredMixin, UpdateView):
     model = ShortURL
     form_class = ShortURLForm
-    template_name = "edit_short_url.html"
+    template_name = "shortner/edit_short_url.html"
     success_url = reverse_lazy("dashboard")
 
     def get_queryset(self):
@@ -39,7 +43,7 @@ class ShortURLUpdateView(LoginRequiredMixin, UpdateView):
 #delete url
 class ShortURLDeleteView(LoginRequiredMixin, DeleteView,):
     model = ShortURL
-    template_name = "delete_short_url.html"
+    template_name = "shortner/delete_short_url.html"
     success_url = reverse_lazy("dashboard")
 
     def get_queryset(self):
