@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <h2>Your Shortened URLs</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Short Code</th>
+        <th>Original URL</th>
+        <th>Clicks</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for url in urls %}
+        <tr>
+          <td>
+            <a href="{% url 'redirect_short_url' url.short_code %}" target="_blank">
+              {{ url.short_code }}
+            </a>
+          </td>
+          <td>{{ url.original_url }}</td>
+          <td>{{ url.click_count }}</td>
+          <td>{{ url.created_at }}</td>
+          <td>
+            <a href="{% url 'edit_short_url' url.pk %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'delete_short_url' url.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No URLs yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
