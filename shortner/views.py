@@ -4,6 +4,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import ShortURL
 from .forms import ShortURLForm
 from django.urls import reverse_lazy
+from django.utils import timezone
+
+
 
 
 #create URL
@@ -16,6 +19,11 @@ class ShortURLCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
+
+        custom_code = form.cleaned_data.get("custom_code")
+        if custom_code:
+            form.instance.short_code = custom_code
+        
         return super().form_valid(form)
 
 #list urls
@@ -39,6 +47,15 @@ class ShortURLUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         return ShortURL.objects.filter(user=self.request.user)
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+
+        custom_code = form.cleaned_data.get("custom_code")
+        if custom_code:
+            form.instance.short_code = custom_code
+        
+        return super().form_valid(form)
 
 #delete url
 class ShortURLDeleteView(LoginRequiredMixin, DeleteView,):
@@ -52,6 +69,9 @@ class ShortURLDeleteView(LoginRequiredMixin, DeleteView,):
 
 def redirect_short_url(request, code):
     short_url = get_object_or_404(ShortURL, short_code= code)
+
+    if short_url.expires_at and short_url.expires_at < timezone.now():
+         return render(request, "shortner/expired.html", {"short_url": short_url})
     short_url.click_count += 1
     short_url.save()
     return redirect(short_url.original_url)

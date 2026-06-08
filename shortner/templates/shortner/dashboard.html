@@ -2,76 +2,89 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-  <!-- Dashboard Statistics -->
+<div class="container mt-4">
+  <!-- Stats Row -->
   <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card text-center">
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm">
         <div class="card-body">
-          <h5 class="card-title">Total URLs</h5>
-          <p class="card-text">{{ urls|length }}</p>
+          <h6 class="card-title">Total URLs</h6>
+          <p class="fs-4">{{ urls|length }}</p>
         </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="card text-center">
+    <div class="col-6 col-md-3">
+      <div class="card text-center shadow-sm">
         <div class="card-body">
-          <h5 class="card-title">Total Clicks</h5>
-          <p class="card-text">{{ total_clicks }}</p>
+          <h6 class="card-title">Total Clicks</h6>
+          <p class="fs-4">{{ total_clicks }}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Table of URLs -->
+  <!-- Table -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Your Shortened URLs</h2>
     <a href="{% url 'create_short_url' %}" class="btn btn-primary">+ Create New</a>
   </div>
 
-  <table class="table table-striped">
-    <thead class="table-dark">
-      <tr>
-        <th>Short URL</th>
-        <th>Original URL</th>
-        <th>Clicks</th>
-        <th>Created At</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for url in urls %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-dark">
         <tr>
-          <td>
-            <a href="http://localhost:8000/s/{{ url.short_code }}" target="_blank">
-              http://localhost:8000/s/{{ url.short_code }}
-            </a>
-            <button class="btn btn-sm btn-primary ms-2 copy-btn"
-                    onclick="navigator.clipboard.writeText('http://localhost:8000/s/{{ url.short_code }}')">
-              Copy
-            </button>
-          </td>
-          <td>{{ url.original_url }}</td>
-          <td>{{ url.click_count }}</td>
-          <td>{{ url.created_at|date:"M d, Y" }}</td>
-          <td>
-            <a href="{% url 'edit_short_url' url.pk %}" class="btn btn-sm btn-warning">Edit</a>
-            <a href="{% url 'delete_short_url' url.pk %}" class="btn btn-sm btn-danger">Delete</a>
-          </td>
+          <th>Short URL</th>
+          <th>Custom Code</th>
+          <th>Original URL</th>
+          <th>Clicks</th>
+          <th>Created At</th>
+          <th>Expires At</th>
+          <th>Actions</th>
         </tr>
-      {% empty %}
-        <tr>
-          <td colspan="5" class="text-center text-muted">No URLs yet. Click “Create New” to add one.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for url in urls %}
+          <tr>
+            <td>
+              <a href="http://localhost:8000/s/{{ url.short_code }}" target="_blank">
+                http://localhost:8000/s/{{ url.short_code }}
+              </a>
+              <button class="btn btn-sm btn-primary ms-2 copy-btn"
+                      onclick="navigator.clipboard.writeText('http://localhost:8000/s/{{ url.short_code }}')">
+                Copy
+              </button>
+            </td>
+            <td>{{ url.short_code }}</td>
+            <td class="text-truncate" style="max-width: 200px;">{{ url.original_url }}</td>
+            <td>{{ url.click_count }}</td>
+            <td>{{ url.created_at|date:"M d, Y" }}</td>
+            <td>
+              {% if url.expires_at %}
+                {{ url.expires_at|date:"M d, Y H:i" }}
+              {% else %}
+                <span class="text-muted">No Expiration</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'edit_short_url' url.pk %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'delete_short_url' url.pk %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="text-center text-muted">No URLs yet. Click “Create New” to add one.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-  <!-- Extra styling for Copy button -->
-  <style>
-    .copy-btn:active {
-      background-color: #e2e6ea !important; /* slightly lighter when clicked */
-      color: #000 !important;
-    }
-  </style>
+<style>
+  .copy-btn:active {
+    background-color: #e2e6ea !important;
+    color: #000 !important;
+  }
+</style>
 {% endblock %}
 

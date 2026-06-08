@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Link Expired{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+  <h2 class="text-danger">This short link has expired</h2>
+  <p>The link you tried to access is no longer available.</p>
+  <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">Go back to Dashboard</a>
+</div>
+{% endblock %}
